@@ -3,11 +3,17 @@ package org.adrianonobre.scrabble;
 /**
  * Created by adriano on 2017-01-01.
  */
-class ConsolePrinter {
+public class ConsolePrinter {
     private final Board board;
+    private final boolean showMines;
 
-    ConsolePrinter(Board board) {
+    public ConsolePrinter(Board board) {
+        this(board, false);
+    }
+
+    public ConsolePrinter(Board board, boolean showMines) {
         this.board = board;
+        this.showMines = showMines;
     }
 
     public void print() {
@@ -15,11 +21,11 @@ class ConsolePrinter {
         final int colCount = board.getColCount();
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < colCount; col++) {
-                final Board.Square square = board.getSquare(row, col);
+                final Square square = board.getSquare(row, col);
                 final String element;
-                if (square.getCurrElement() != null) {
-                    element = square.getCurrElement();
-                } else if (square.hasMine()) {
+                if (SquareHelper.containsLetter(square)) {
+                    element = "" + ((SquareContent.Letter) square.getContent()).getLetter();
+                } else if (showMines && (square.getContent() instanceof SquareContent.Mine)) {
                     element = "@";
                 } else {
                     element = "□";

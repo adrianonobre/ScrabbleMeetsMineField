@@ -1,37 +1,33 @@
 package org.adrianonobre.scrabble;
 
+import org.adrianonobre.scrabble.visitor.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by adriano on 2016-12-26.
  */
 public class Game {
 
-    public enum PlayOutcome {
-        SUCCESS,
-        INVALID_WORD,
-        INVALID_NEW_WORD_FORMED,
-        BOOM,
-        OUT_OF_BOUNDS,
-        COLLISION
-    }
-
-    public enum Orientation {
-        HORIZONTAL,
-        VERTICAL
-    }
-
-    private final Set<String> dictWords;
+    private List<Visitor> visitors;
     private Board board;
     private int score;
 
     public Game(Set<String> dictWords) {
-        this.dictWords = dictWords;
+        dictWords = dictWords.stream().map(String::toUpperCase).collect(Collectors.toSet());
+
+        visitors = new ArrayList<>();
+        visitors.add(new LetterCollisionVisitor());
+        visitors.add(new ValidWordVisitor(dictWords));
+        visitors.add(new MineVisitor());
+        visitors.add(new IntersectExistingWordVisitor());
     }
 
     public void start(int rowCount, int colCount) {
-        this.board = new Board();
-        board.init(rowCount, colCount);
+        this.board = new Board(rowCount, colCount);
         placeMines(board);
         score = 0;
     }
@@ -44,101 +40,79 @@ public class Game {
         final int rows = board.getRowCount();
         final int cols = board.getColCount();
 
-        for (int i = 0 ; i < rows * cols * 0.05; i++) {
+        final double mineRatio = 0.05; // the higher this number, the harder it is...
+
+        for (int i = 0; i < rows * cols * mineRatio; i++) {
             int mine = (int) (Math.random() * rows * cols);
 
             final int row = mine / cols;
             final int col = mine % cols;
 
-            final Board.Square square = board.getSquare(row, col);
-            square.setHasMine(true);
+            final Square square = board.getSquare(row, col);
+            square.setContent(new SquareContent.Mine());
         }
     }
 
     public PlayOutcome play(int row, int col, Orientation orientation, String word) {
+
         word = word.toUpperCase();
-        // validate
-        if (!dictWords.contains(word)) {
-            return PlayOutcome.INVALID_WORD;
-        }
 
-        int wordScore = 0;
+        PlayOutcome playOutcome = executePlay(row, col, orientation, word);
 
-        Board board = (Board) this.board.clone();
-
-        Board.BoardIterator iterator = board.iterator(row, col, orientation);
-
-        for (int i = 0; i < word.length(); i++) {
-            if (iterator.hasNext()) {
-                final Board.Square square = iterator.next();
-                if (square.hasMine()) {
-                    return PlayOutcome.BOOM;
-
-                } else if (square.getCurrElement() != null &&
-                            !square.getCurrElement().equals("" + word.charAt(i))) {
-                    return PlayOutcome.COLLISION;
-                }
-                square.setCurrElement("" + word.charAt(i));
-
-            } else {
-                return PlayOutcome.OUT_OF_BOUNDS;
-            }
-        }
-        // validates words formed by existing letters after the word
-        String newWord = getContinuousWord(iterator);
-        if (!dictWords.contains(newWord)) {
-            return PlayOutcome.INVALID_NEW_WORD_FORMED;
+        if (playOutcome.getOutcome() != PlayOutcome.OutcomeType.SUCCESS) {
+            restoreBoardState(row, col, orientation, word);
         } else {
-            wordScore += 10 + (newWord.length() - word.length());
+            score += playOutcome.getPlayScore();
         }
 
-        Orientation reverseOrientation = orientation == Orientation.VERTICAL ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-        iterator = board.iterator(row, col, orientation);
-        while (iterator.hasNext()) {
-            final Board.Square square = iterator.next();
-            if (square.getCurrElement() != null) {
-
-                Board.BoardIterator reverseIterator = board.iterator(iterator.getCurrRow(), iterator.getCurrCol(), reverseOrientation);
-                String intersectingWord = getContinuousWord(reverseIterator);
-                if (intersectingWord.length() > 1) {
-                   if (!dictWords.contains(intersectingWord)) {
-                        return PlayOutcome.INVALID_NEW_WORD_FORMED;
-                   } else {
-                       wordScore += 5;
-                   }
-                }
-
-            } else {
-                break;
-            }
-        }
-
-        score += wordScore;
-        this.board = board;
-        return PlayOutcome.SUCCESS;
+        return playOutcome;
     }
 
-    private String getContinuousWord(Board.BoardIterator iterator) {
-
-        while (iterator.hasPrevious()) {
-            final Board.Square square = iterator.previous();
-            if (square.getCurrElement() == null) {
+    private void restoreBoardState(int row, int col, Orientation orientation, String word) {
+        Square square = board.getSquare(row, col);
+        Square.SquareIterator iterator = orientation == Orientation.HORIZONTAL ? square.horizontalIterator() : square.verticalIterator();
+        for (int i = 0; i < word.length(); i++) {
+            final Square sq = iterator.current();
+            sq.restoreContent();
+            if (iterator.hasNext()) {
                 iterator.next();
-                break;
-            }
-        }
-
-        final StringBuilder builder = new StringBuilder(iterator.current().getCurrElement());
-
-        while (iterator.hasNext()) {
-            final Board.Square square = iterator.next();
-            if (square.getCurrElement() != null) {
-                builder.append(square.getCurrElement());
             } else {
                 break;
             }
         }
-        return builder.toString();
+    }
+
+    private PlayOutcome executePlay(int row, int col, Orientation orientation, String word) {
+        PlayOutcome playOutcome = new PlayOutcome();
+
+        SquareSequence squareSequence = BoardHelper.placeWordOnTheBoard(board, row, col, orientation, word, playOutcome);
+        if (playOutcome.getOutcome() == PlayOutcome.OutcomeType.FAILURE) {
+            return playOutcome;
+        }
+
+        for (Visitor visitor : visitors) {
+            squareSequence.accept(visitor, playOutcome);
+            if (playOutcome.getOutcome() == PlayOutcome.OutcomeType.FAILURE) {
+                return playOutcome;
+            }
+        }
+
+        Square square = board.getSquare(row, col);
+        Square.SquareIterator iterator = orientation == Orientation.HORIZONTAL ? square.horizontalIterator() : square.verticalIterator();
+        for (int i = 0; i < word.length(); i++) {
+            final Square sq = iterator.current();
+            for (Visitor visitor : visitors) {
+                sq.accept(visitor, playOutcome);
+                if (playOutcome.getOutcome() == PlayOutcome.OutcomeType.FAILURE) {
+                    return playOutcome;
+                }
+            }
+            if (iterator.hasNext()) {
+                iterator.next();
+            }
+        }
+
+        return playOutcome;
     }
 
     public Board getBoard() {
