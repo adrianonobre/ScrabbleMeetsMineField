@@ -1,4 +1,4 @@
-Rules for "Scrabble Meets Minefield":
+##Rules for "Scrabble Meets Minefield":
 
 - a new word can cross ones already on the board but in the intersection point(s) must contain the same letters
 - any sequence of letters adjacent to the new word must form a valid word (vertically and horizontally)
