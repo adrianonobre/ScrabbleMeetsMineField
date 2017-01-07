@@ -1,4 +1,12 @@
-##Rules for "Scrabble Meets Minefield":
+# Scrabble Meets Minefield
+
+## Running the game
+Execute the jar passing the word file as the single argument to the program:
+```
+java -jar explosive-scrabble-1.0-SNAPSHOT.jar /usr/share/dict/words
+```
+
+## Rules
 
 - a new word can cross ones already on the board but in the intersection point(s) must contain the same letters
 - any sequence of letters adjacent to the new word must form a valid word (vertically and horizontally)
