@@ -8,18 +8,23 @@ Rules for "Scrabble Meets Minefield":
 ##### Examples:
 - INVALID PLAY (new word PORT is does not join any existing word):
 
+<pre>
+□ □ □ □ □ □ □ □
 A I R □ P O R T
+□ □ □ □ □ □ □ □
+</pre>
 
 - VALID PLAY (new word PORT joins the existing word AIR):
 
+<pre>
+□ □ □ □ □ □ □ □
 A I R P O R T □
-
-or
-
+□ □ □ □ □ □ □ □
+</pre>
+OR
+<pre>
 □ □ P □ □ □ □ □
-
 □ □ O □ □ □ □ □
-
 A I R □ □ □ □ □
-
 □ □ T □ □ □ □ □
+</pre>
