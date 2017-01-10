@@ -50,9 +50,9 @@ public class Driver {
             System.out.print("orientation (v/h): ");
             String o = getInput(br);
             Orientation orientation = o.toUpperCase().startsWith("V") ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-            System.out.print("row (0-" + BOARD_ROW_COUNT + "): ");
+            System.out.print("row (0-" + (BOARD_ROW_COUNT - 1) + "): ");
             final Integer row = Integer.valueOf(getInput(br));
-            System.out.print("col (0-" + BOARD_COL_COUNT + "): ");
+            System.out.print("col (0-" + (BOARD_COL_COUNT - 1) + "): ");
             final Integer col = Integer.valueOf(getInput(br));
 
             makePlay(game, row, col, orientation, word, consolePrinter);
