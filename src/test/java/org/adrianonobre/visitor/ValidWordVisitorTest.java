@@ -98,11 +98,11 @@ public class ValidWordVisitorTest {
     @Test
     @Parameters()
     public void test(String[] boardState, int row, int col, PlayOutcome.OutcomeType expectedOutcome) {
-        final Board board = BoardTestHelper.getBoardWithSetState(boardState);
+        final BoardImpl board = BoardTestHelper.getBoardWithSetState(boardState);
 
         PlayOutcome playOutcome = new PlayOutcome();
-        final Square square = board.getSquare(row, col);
-        square.accept(new ValidWordVisitor(KNOWN_WORDS), playOutcome);
+        final Cell cell = board.getSquare(row, col);
+        cell.accept(new ValidWordVisitor(KNOWN_WORDS), playOutcome);
 
         Assert.assertEquals(expectedOutcome, playOutcome.getOutcome());
     }

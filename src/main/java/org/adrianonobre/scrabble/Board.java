@@ -1,34 +1,12 @@
 package org.adrianonobre.scrabble;
 
 /**
- * Created by adriano on 2016-12-27.
+ * Created by adriano on 2017-03-05.
  */
-public class Board {
+public interface Board {
+    int getRowCount();
 
-    private Square[][] squares;
+    int getColCount();
 
-    public Board(int rowCount, int colCount) {
-        this.squares = new Square[rowCount][];
-
-        for (int r = 0; r < rowCount; r++) {
-            squares[r] = new Square[colCount];
-
-            for (int c = 0; c < colCount; c++) {
-                squares[r][c] = new Square(this, r, c);
-            }
-        }
-    }
-
-    public int getRowCount() {
-        return squares.length;
-    }
-
-    public int getColCount() {
-        return squares[0].length;
-    }
-
-    public Square getSquare(int row, int col) {
-        return squares[row][col];
-    }
-
+    Cell getSquare(int row, int col);
 }

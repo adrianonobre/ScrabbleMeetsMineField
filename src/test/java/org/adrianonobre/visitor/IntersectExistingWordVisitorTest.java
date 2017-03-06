@@ -6,7 +6,6 @@ import junitparams.Parameters;
 import org.adrianonobre.BoardTestHelper;
 import org.adrianonobre.scrabble.*;
 import org.adrianonobre.scrabble.visitor.IntersectExistingWordVisitor;
-import org.adrianonobre.scrabble.visitor.ValidWordVisitor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,7 @@ public class IntersectExistingWordVisitorTest {
     @Test
     @Parameters()
     public void test(String[] boardState, String word, int row, int col, Orientation orientation, PlayOutcome.OutcomeType expectedOutcome) {
-        final Board board = BoardTestHelper.getBoardWithSetState(boardState);
+        final BoardImpl board = BoardTestHelper.getBoardWithSetState(boardState);
 
         PlayOutcome playOutcome = new PlayOutcome();
         final SquareSequence squareSequence = BoardHelper.placeWordOnTheBoard(board, row, col, orientation, word, playOutcome);

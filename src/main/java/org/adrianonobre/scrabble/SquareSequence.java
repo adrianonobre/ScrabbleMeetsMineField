@@ -10,23 +10,23 @@ import java.util.List;
  */
 public class SquareSequence {
 
-    private List<Square> letters = new ArrayList<>();
+    private List<Cell> letters = new ArrayList<>();
 
-    public void addLetter(Square square) {
-        letters.add(square);
+    public void addLetter(Cell cell) {
+        letters.add(cell);
     }
 
     public int length() {
         return letters.size();
     }
 
-    public List<Square> getLetters() {
+    public List<Cell> getLetters() {
         return letters;
     }
 
-    public boolean contains(Square square) {
-        for (Square letter : letters) {
-            if (letter.getRow() == square.getRow() && letter.getCol() == square.getCol()) {
+    public boolean contains(Cell cell) {
+        for (Cell letter : letters) {
+            if (letter.getRow() == cell.getRow() && letter.getCol() == cell.getCol()) {
                 return true;
             }
         }

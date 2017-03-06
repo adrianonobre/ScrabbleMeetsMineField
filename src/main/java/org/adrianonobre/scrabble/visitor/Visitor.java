@@ -1,7 +1,7 @@
 package org.adrianonobre.scrabble.visitor;
 
+import org.adrianonobre.scrabble.Cell;
 import org.adrianonobre.scrabble.PlayOutcome;
-import org.adrianonobre.scrabble.Square;
 import org.adrianonobre.scrabble.SquareSequence;
 
 /**
@@ -11,5 +11,5 @@ public interface Visitor {
 
     void visitSquareSequence(SquareSequence squareSequence, PlayOutcome playOutcome);
 
-    void visitSquare(Square square, PlayOutcome playOutcome);
+    void visitSquare(Cell cell, PlayOutcome playOutcome);
 }

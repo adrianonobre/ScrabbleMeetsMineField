@@ -5,13 +5,13 @@ package org.adrianonobre.scrabble;
  */
 public class BoardHelper {
     public static SquareSequence placeWordOnTheBoard(Board board, int row, int col, Orientation orientation, String word, PlayOutcome playOutcome) {
-        Square square = board.getSquare(row, col);
+        Cell cell = board.getSquare(row, col);
         SquareSequence squareSequence = new SquareSequence();
-        Square.SquareIterator iterator = orientation == Orientation.HORIZONTAL ? square.horizontalIterator() : square.verticalIterator();
+        CellIterator iterator = orientation == Orientation.HORIZONTAL ? cell.horizontalIterator() : cell.verticalIterator();
         for (int i = 0; i < word.length(); i++) {
-            square = iterator.current();
-            square.setContent(new SquareContent.Letter(word.charAt(i)));
-            squareSequence.addLetter(square);
+            cell = iterator.current();
+            cell.setContent(new SquareContent.Letter(word.charAt(i)));
+            squareSequence.addLetter(cell);
             if (iterator.hasNext()) {
                 iterator.next();
             } else {

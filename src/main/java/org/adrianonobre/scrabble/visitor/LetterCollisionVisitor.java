@@ -1,9 +1,6 @@
 package org.adrianonobre.scrabble.visitor;
 
-import org.adrianonobre.scrabble.PlayOutcome;
-import org.adrianonobre.scrabble.Square;
-import org.adrianonobre.scrabble.SquareContent;
-import org.adrianonobre.scrabble.SquareSequence;
+import org.adrianonobre.scrabble.*;
 
 /**
  * Created by adriano on 2017-01-05.
@@ -15,9 +12,9 @@ public class LetterCollisionVisitor implements Visitor {
     }
 
     @Override
-    public void visitSquare(Square square, PlayOutcome playOutcome) {
-        if (square.getPreviousContent() instanceof SquareContent.Letter
-                    && !square.getPreviousContent().equals(square.getContent())) {
+    public void visitSquare(Cell cell, PlayOutcome playOutcome) {
+        if (cell.getPreviousContent() instanceof SquareContent.Letter
+                    && !cell.getPreviousContent().equals(cell.getContent())) {
             playOutcome.setOutcome(PlayOutcome.OutcomeType.FAILURE, "collides with existing word");
         } else {
             playOutcome.setOutcome(PlayOutcome.OutcomeType.SUCCESS);

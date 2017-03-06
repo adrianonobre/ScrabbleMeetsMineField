@@ -1,5 +1,6 @@
 package org.adrianonobre.scrabble;
 
+import lddecker.board.impl.FancyBoard;
 import org.adrianonobre.scrabble.visitor.*;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class Game {
     }
 
     public void start(int rowCount, int colCount) {
-        this.board = new Board(rowCount, colCount);
+        this.board = new FancyBoard(rowCount, colCount);
         placeMines(board);
         score = 0;
     }
@@ -48,8 +49,8 @@ public class Game {
             final int row = mine / cols;
             final int col = mine % cols;
 
-            final Square square = board.getSquare(row, col);
-            square.setContent(new SquareContent.Mine());
+            final Cell cell = board.getSquare(row, col);
+            cell.setContent(new SquareContent.Mine());
         }
     }
 
@@ -69,10 +70,10 @@ public class Game {
     }
 
     private void restoreBoardState(int row, int col, Orientation orientation, String word) {
-        Square square = board.getSquare(row, col);
-        Square.SquareIterator iterator = orientation == Orientation.HORIZONTAL ? square.horizontalIterator() : square.verticalIterator();
+        Cell cell = board.getSquare(row, col);
+        CellIterator iterator = orientation == Orientation.HORIZONTAL ? cell.horizontalIterator() : cell.verticalIterator();
         for (int i = 0; i < word.length(); i++) {
-            final Square sq = iterator.current();
+            final Cell sq = iterator.current();
             sq.restoreContent();
             if (iterator.hasNext()) {
                 iterator.next();
@@ -97,10 +98,10 @@ public class Game {
             }
         }
 
-        Square square = board.getSquare(row, col);
-        Square.SquareIterator iterator = orientation == Orientation.HORIZONTAL ? square.horizontalIterator() : square.verticalIterator();
+        Cell cell = board.getSquare(row, col);
+        CellIterator iterator = orientation == Orientation.HORIZONTAL ? cell.horizontalIterator() : cell.verticalIterator();
         for (int i = 0; i < word.length(); i++) {
-            final Square sq = iterator.current();
+            final Cell sq = iterator.current();
             for (Visitor visitor : visitors) {
                 sq.accept(visitor, playOutcome);
                 if (playOutcome.getOutcome() == PlayOutcome.OutcomeType.FAILURE) {

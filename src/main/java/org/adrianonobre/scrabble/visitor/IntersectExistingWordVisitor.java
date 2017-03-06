@@ -16,12 +16,12 @@ public class IntersectExistingWordVisitor implements Visitor {
             return;
         }
 
-        for (Square square : squareSequence.getLetters()) {
-            List<Square> neighbours = new ArrayList<>();
-            neighbours.addAll(getNeighbours(square.horizontalIterator()));
-            neighbours.addAll(getNeighbours(square.verticalIterator()));
+        for (Cell cell : squareSequence.getLetters()) {
+            List<Cell> neighbours = new ArrayList<>();
+            neighbours.addAll(getNeighbours(cell.horizontalIterator()));
+            neighbours.addAll(getNeighbours(cell.verticalIterator()));
 
-            for (Square neighbour : neighbours) {
+            for (Cell neighbour : neighbours) {
                 if (!squareSequence.contains(neighbour)) {
                     if (SquareHelper.containsLetter(neighbour)) {
                         playOutcome.addScore(10);
@@ -35,11 +35,11 @@ public class IntersectExistingWordVisitor implements Visitor {
     }
 
     public boolean isFirstWordOnTheBoard(SquareSequence squareSequence) {
-        final Board board = squareSequence.getLetters().get(0).getBoard();
+        final BoardImpl board = squareSequence.getLetters().get(0).getBoard();
         for (int r = 0; r < board.getRowCount(); r++) {
             for (int c = 0; c < board.getColCount(); c++) {
-                final Square square = board.getSquare(r, c);
-                if (SquareHelper.containsLetter(square) && !squareSequence.contains(square)) {
+                final Cell cell = board.getSquare(r, c);
+                if (SquareHelper.containsLetter(cell) && !squareSequence.contains(cell)) {
                     return false;
                 }
             }
@@ -48,21 +48,21 @@ public class IntersectExistingWordVisitor implements Visitor {
     }
 
 
-    private List<Square> getNeighbours(Square.SquareIterator squareIterator) {
-        List<Square> neighbours = new ArrayList<>();
+    private List<Cell> getNeighbours(CellIterator cellIterator) {
+        List<Cell> neighbours = new ArrayList<>();
 
-        if (squareIterator.hasPrevious()) {
-            neighbours.add(squareIterator.previous());
-            squareIterator.next();
+        if (cellIterator.hasPrevious()) {
+            neighbours.add(cellIterator.previous());
+            cellIterator.next();
         }
-        if (squareIterator.hasNext()) {
-            neighbours.add(squareIterator.next());
+        if (cellIterator.hasNext()) {
+            neighbours.add(cellIterator.next());
         }
         return neighbours;
     }
 
     @Override
-    public void visitSquare(Square square, PlayOutcome playOutcome) {
+    public void visitSquare(Cell cell, PlayOutcome playOutcome) {
         playOutcome.setOutcome(PlayOutcome.OutcomeType.SUCCESS);
     }
 }

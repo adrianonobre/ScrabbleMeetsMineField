@@ -21,14 +21,14 @@ public class ValidWordVisitor implements Visitor {
     }
 
     @Override
-    public void visitSquare(Square square, PlayOutcome playOutcome) {
-        if (!SquareHelper.containsLetter(square)) {
+    public void visitSquare(Cell cell, PlayOutcome playOutcome) {
+        if (!SquareHelper.containsLetter(cell)) {
             playOutcome.setOutcome(PlayOutcome.OutcomeType.FAILURE, "this might be a programming error");
             return;
         }
 
         int score = 0;
-        Square.SquareIterator iterator = square.horizontalIterator();
+        CellIterator iterator = cell.horizontalIterator();
         String word = getContinuousWord(iterator);
         if (word.length() > 1 && !knownWords.contains(word)) {
             playOutcome.setOutcome(PlayOutcome.OutcomeType.FAILURE, "formed invalid word " + word);
@@ -36,7 +36,7 @@ public class ValidWordVisitor implements Visitor {
         }
         score += word.length();
 
-        iterator = square.verticalIterator();
+        iterator = cell.verticalIterator();
         word = getContinuousWord(iterator);
         if (word.length() > 1 && !knownWords.contains(word)) {
             playOutcome.setOutcome(PlayOutcome.OutcomeType.FAILURE, "formed invalid word " + word);
@@ -48,8 +48,8 @@ public class ValidWordVisitor implements Visitor {
         playOutcome.setOutcome(PlayOutcome.OutcomeType.SUCCESS);
     }
 
-    private String getContinuousWord(Square.SquareIterator iterator) {
-        Square wordStart = null;
+    private String getContinuousWord(CellIterator iterator) {
+        Cell wordStart = null;
         while (iterator.hasPrevious()) {
             wordStart = iterator.previous();
             if (!SquareHelper.containsLetter(wordStart)) {
@@ -63,11 +63,11 @@ public class ValidWordVisitor implements Visitor {
 
         StringBuilder word = new StringBuilder("" + ((SquareContent.Letter) wordStart.getContent()).getLetter());
         while (iterator.hasNext()) {
-            Square nextSquare = iterator.next();
-            if (!SquareHelper.containsLetter(nextSquare)) {
+            Cell nextCell = iterator.next();
+            if (!SquareHelper.containsLetter(nextCell)) {
                 break;
             } else {
-                word.append(((SquareContent.Letter) nextSquare.getContent()).getLetter());
+                word.append(((SquareContent.Letter) nextCell.getContent()).getLetter());
             }
         }
         return word.toString();
